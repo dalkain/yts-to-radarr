@@ -45,7 +45,7 @@ def get_those_movies():
                                 ## initially need to return all language results. The script will filter the list after 
                                 ## it's done with the YTS API and before outputting a CSV or adding movies to Radarr
     output_csv = True       # Do you want to output a CSV with all the juicy details from the YTS API?
-    radarr_autoadd = True  # Do you want the script to automatically add all found movies
+    radarr_autoadd = True   # Do you want the script to automatically add all found movies
                                 ## to Radarr using the radarr_api_parameters specified below?
     # Change these parameters for your Radarr instance/preferences
     radarr_api_parameters = {
