@@ -39,8 +39,13 @@ def get_those_movies():
         'udp://tracker.internetwarriors.net:1337',
         'udp://p4p.arenabg.ch:1337'
     ]
+    # Various settings
+    only_english = True     # Only return movies that are primarily in English? 
+                                ## NOTE: The YTS API doesn't actually support filtering on this value, so it will still
+                                ## initially need to return all language results. The script will filter the list after 
+                                ## it's done with the YTS API and before outputting a CSV or adding movies to Radarr
     output_csv = True       # Do you want to output a CSV with all the juicy details from the YTS API?
-    radarr_autoadd = True   # Do you want the script to automatically add all found movies
+    radarr_autoadd = True  # Do you want the script to automatically add all found movies
                                 ## to Radarr using the radarr_api_parameters specified below?
     # Change these parameters for your Radarr instance/preferences
     radarr_api_parameters = {
@@ -64,7 +69,7 @@ def get_those_movies():
 ###############################################
     # Do ALL the things
     df_yts = ytsapi(yts_query_parameters)
-    df_yts = yts_cleandata(df_yts, open_tracker_announce_urls, yts_query_parameters['quality'])
+    df_yts = yts_cleandata(df_yts, open_tracker_announce_urls, yts_query_parameters['quality'], only_english)
     if output_csv: 
         try:
             df_yts.to_csv("yts_movies.csv", index=False)
@@ -83,13 +88,13 @@ def ytsapi(yts_query_params):
     pages = ytsapi_getpage(yts_api_url, yts_query_params, mode='pages')
 
     # pages = 3   # when debugging, you probably don't want to pull every page.
-    print("  Grabbing " + str(pages) + " pages worth of results. This may take some time...")
+    print("\n  Grabbing " + str(pages) + " pages worth of results. This may take some time...")
     for page in range(pages):
         page += 1
-        # print("Grabbing page " + str(page) + "...")
+        # print("Grabbing page " + str(page) + "...") # might come in handy when debugging
         if page % 10 == 0:
-            # Rudimentary progress display. ( ͡° ͜ʖ ͡°)
-            print("  Grabbing page " + str(page) + "/" + str(pages) + " (~" + str(math.ceil(((page-1)/pages)*100)) + "% complete)...")
+            # Rudimentary progress display ༼ つ ◕_◕ ༽つ
+            print("  Grabbing page " + str(page) + "/" + str(pages) + "... (~" + str(math.ceil(((page-1)/pages)*100)) + "% complete)")
         pagedata = ytsapi_getpage(yts_api_url, yts_query_params, page=page).json()['data']
         df = pd.concat([df, pd.DataFrame(pagedata['movies'])], axis=0)      
     return df
@@ -100,9 +105,11 @@ def ytsapi_getpage(url, query_params, page=1, mode='data'):
         response = requests.get(url, params=query_params, timeout=60.0)
         response.raise_for_status()
         if mode == 'pages':
-            print("  Found " + str(response.json()['data']['movie_count']) + " movies that match query parameters.\n")
+            movie_count = response.json()['data']['movie_count']
+            page_count = int(math.ceil(response.json()['data']['movie_count']/response.json()['data']['limit']))
+            print("  Found " + str(movie_count) + " movies that match query parameters. (" + str(page_count) + " pages)")
             input("  Press ENTER to continue with pulling data.")
-            return int(math.ceil(response.json()['data']['movie_count']/response.json()['data']['limit']))
+            return page_count
         else:
             return response
     except requests.exceptions.HTTPError as errh:
@@ -115,17 +122,24 @@ def ytsapi_getpage(url, query_params, page=1, mode='data'):
         print(err)
     print("  Please check your query parameters or wait a little while and try again.")
     
-def yts_cleandata(df, announce_urls, quality):
+def yts_cleandata(df, announce_urls, quality, only_english):
     print("\n  Cleaning up the data. Please wait...")
     magnet_announce_string = ""
     for url in announce_urls:
         magnet_announce_string += "&tr=" + url
         
-    # Drop duplicate movie ids, if they exist
+    # Drop duplicate YTS movie ids, if they exist
     df.drop_duplicates(['id'], keep='first', ignore_index=True, inplace=True)
     # Drop unnecessary movies columns
     df.drop(columns=['summary','description_full','background_image','background_image_original',
                             'small_cover_image','medium_cover_image','large_cover_image'], inplace=True)
+    if only_english:
+        # Just saving this list here for potential future changes. All languages found via the YTS API:
+        # af, ak, am, ar, be, bn, bo, bs, ca, cn, cs, cy, da, de, el, en, es, et, eu, fa, fi, fr, ga, gl, 
+        # he, hi, ht, hu, hy, id, is, it, ja, ka, kk, km, kn, ko, ku, ky, la, lg, lt, lv, mk, ml, mn, mr, 
+        # ms, mt, nb, nl, no, os, pa, pl, ps, pt, ro, ru, sh, sk, sl, so, sr, st, sv, sw, ta, te, th, tl, 
+        # tr, uk, ur, vi, wo, xx, yi, zh, zu
+        df = df[(df['language'] == 'en') | (df['language'] == 'uk')]
 
     # Break out torrent data
     df_torrents = df.explode('torrents').reset_index(drop=True)[['id', 'torrents']]

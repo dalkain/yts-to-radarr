@@ -2,14 +2,17 @@
 
 YES! I'm a dirty pleb and I like YIFY encodes for my personal consumption. If that also describes you, then please feel free to adapt script this to your wants.
 
-While I already have the YTS RSS list set up in Radarr, the 6-hour minimum between list syncs means some new things and all past releases (since the RSS only shows the 100 most recent releases) are missed. I spent a couple hours throwing together this python script to be able to do a one-time (or multiple times with certain criteria of course) pull of more of the YTS catalog and add the results directly into Radarr and initiate an automatic search. I did make it somewhat user-friendly for individual customization, though!
+The limitations of the YTS RSS feeds combined with the 6-hour minimum refresh for RSS feeds in Radarr means I occasionally miss some new YTS releases and am unable to automate pulling the back catalog. So, I spent a couple hours throwing together this python script to extract more of the YTS catalog from the YTS API and add them directly into Radarr and initiate an automatic search. I tried to make it somewhat user-friendly for individual customization (or for running multiple times with different criteria)!
 
-You'll probably want to make sure that YTS is set up via Prowlarr/Jackett as an indexer in Radarr before using this.
+TO RUN:
+- You'll probably want to make sure that YTS is set up via Prowlarr/Jackett as an indexer in Radarr before using this
+- Modify all of the variables at the top of main.py to suit your needs
+- No, I didn't make it guided or executable or anything; it's just a flat python script that needs to be run in a terminal
 
-I've got minimal experience with APIs, and had never even looked at the YTS or Radarr API documentation prior to making this. I don't know if the YTS API has rate limits as their documenbtation doesn't specify anything. It seems to randomly stop returning things, but I never get an actual cooldown response in my (admittedly limited) testing. 
+I run Radarr in docker on UnRAID using the lsio/radarr:nightly image (v4.2.0.6209 when this readme was updated), and I ran this script from my PC running python 3.9. I did not test this on other images/platforms, but it should work fine as long as your version of Radarr uses v3 of the API (and if your Radarr installation is so far out of date that is does not support the v3 API....update your stuff).
 
-I might flesh this out a bit or clean it up more down the road, but feel free to fork/PR/etc.
+I've got minimal experience with APIs, and had never even looked at the YTS or Radarr API documentation prior to making this. I don't know if the YTS API has rate limits as their documenbtation doesn't specify anything. The API seems to randomly stop returning things sometimes, but I've also been able to run a test pull of every 1080p encode they've ever released successfully (which is over 800 GETs). I never get an actual cooldown response in my (admittedly limited) testing. 
 
-USE AT YOUR OWN RISK! I AM NOT RESPONSIBLE FOR WHAT YOU DO WITH THIS SCRIPT OR IF YOUR RADARR INSTALLATION DOESN'T PLAY NICE WITH GETTING HAMMERED WITH API CALLS!
+I will probably flesh this out a bit or clean it up more at some point down the road, but feel free to modify it for your own use.
 
-FYI, I run Radarr in docker on UnRAID using the lsio/radarr:nightly image. I did not test this on other images, but it should be perfectly functional as long as your version of Radarr uses v3 of the API (and if yours is so far out of date that is does not support tthe v3 API....update your stuff). 
+DISCLAIMER: USE AT YOUR OWN RISK! I AM NOT RESPONSIBLE FOR WHAT INFORMATION YOU GATHER WITH THIS SCRIPT OR IF YOUR RADARR INSTALLATION DOESN'T PLAY NICE WHEN GETTING HAMMERED WITH API CALLS!
