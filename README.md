@@ -10,6 +10,6 @@ I've got minimal experience with APIs, and had never even looked at the YTS or R
 
 I might flesh this out a bit or clean it up more down the road, but feel free to fork/PR/etc.
 
-USE AT YOUR OWN RISK! I AM NOT RESPONSIBLE FOR WHAT YOU DO WITH THIS SCRIPT OR IF YOUR RADARR INSTALLATION DOESN'T PLAY NICE WITH HOW IT WORKED FOR ME!
+USE AT YOUR OWN RISK! I AM NOT RESPONSIBLE FOR WHAT YOU DO WITH THIS SCRIPT OR IF YOUR RADARR INSTALLATION DOESN'T PLAY NICE WITH GETTING HAMMERED WITH API CALLS!
 
-FYI, I run Radarr in docker using the lsio/radarr:nightly image. I did not test this on other versions, but it should be perfectly functional as long as your version of Radarr uses v3 of the API (and if yours is so far out of date that is does not support tthe v3 API....update your stuff). 
+FYI, I run Radarr in docker on UnRAID using the lsio/radarr:nightly image. I did not test this on other images, but it should be perfectly functional as long as your version of Radarr uses v3 of the API (and if yours is so far out of date that is does not support tthe v3 API....update your stuff). 
