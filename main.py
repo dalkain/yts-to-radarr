@@ -45,7 +45,7 @@ def get_those_movies():
     # Change these parameters for your Radarr instance/preferences
     radarr_api_parameters = {
         'url': 'http://192.168.10.2:7878',      # Protocol, IP/hostname, and port used to access Radarr
-        'api_key': 'REDACTED',  # Copy directly from Radarr 
+        'api_key': 'REDACTED',                  # Copy directly from Radarr 
                                                     ## Settings > General > Security > API Key
         'root_folder': '/data/media/Movies',    # Must match Path exactly as shown in Radarr
                                                     ## Settings > Media Management > Root Folders > Path
