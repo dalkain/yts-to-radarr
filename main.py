@@ -89,7 +89,7 @@ def ytsapi(yts_query_params):
         # print("Grabbing page " + str(page) + "...")
         if page % 10 == 0:
             # Rudimentary progress display. ( ͡° ͜ʖ ͡°)
-            print("  Grabbing page " + str(page) + "/" + str(pages) + " (~" + str(math.ceil((page/pages)*100)) + "% complete)...")
+            print("  Grabbing page " + str(page) + "/" + str(pages) + " (~" + str(math.ceil(((page-1)/pages)*100)) + "% complete)...")
         pagedata = ytsapi_getpage(yts_api_url, yts_query_params, page=page).json()['data']
         df = pd.concat([df, pd.DataFrame(pagedata['movies'])], axis=0)      
     return df
