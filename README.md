@@ -7,7 +7,7 @@ The limitations of the YTS RSS feeds combined with the 6-hour minimum refresh fo
 TO RUN:
 - You'll probably want to make sure that YTS is set up via Prowlarr/Jackett as an indexer in Radarr before using this
 - Modify all of the variables at the top of main.py to suit your needs
-- No, I didn't make it guided or executable or anything; it's just a flat python script that needs to be run in a terminal
+- No, I didn't make it guided or executable or anything; it's just a flat python script that needs to be run in a terminal. Make sure the pip packages in requirements.txt are installed in your environment.
 
 I run Radarr in docker on UnRAID using the lsio/radarr:nightly image (v4.2.0.6209 when this readme was updated), and I ran this script from my PC running python 3.9. I did not test this on other images/platforms, but it should work fine as long as your version of Radarr uses v3 of the API (and if your Radarr installation is so far out of date that is does not support the v3 API....update your stuff).
 
