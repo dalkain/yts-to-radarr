@@ -2,7 +2,7 @@
 
 YES! I'm a dirty pleb and I like YIFY encodes for my personal consumption. If that also describes you, then please feel free to adapt script this to your wants.
 
-While I already have the YTS RSS list set up in Radarr, the 6-hour minimum between list syncs means some new things and all past releases (since the RSS only shows the 100 most recent releases) are missed. I spent a couple hours throwing together this python script to be able to do a one-time (or multiple times with certain criteria of course) pull of more of the YTS catalog and import the lists dirtectly into Radarr and search for them. I did make it somewhat user-friendly for individual customization, though!
+While I already have the YTS RSS list set up in Radarr, the 6-hour minimum between list syncs means some new things and all past releases (since the RSS only shows the 100 most recent releases) are missed. I spent a couple hours throwing together this python script to be able to do a one-time (or multiple times with certain criteria of course) pull of more of the YTS catalog and add the results directly into Radarr and initiate an automatic search. I did make it somewhat user-friendly for individual customization, though!
 
 You'll probably want to make sure that YTS is set up via Prowlarr/Jackett as an indexer in Radarr before using this.
 
