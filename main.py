@@ -25,7 +25,7 @@ def get_those_movies():
     # These trackers will get appended to the magnet_url that ends up in the DataFrame and CSV output
     # NOTE: The ones shown here are listed in the official YTS API docs as examples, but I'm pretty sure most 
     # (or all) of them no longer work. These are only important if you plan to manually add magnets to your 
-    # client from the CSV output instead of letting Radarr do the searching.
+    # torrent client from the CSV output instead of letting Radarr do the searching.
     # example: 'udp://sometracker.url:80/announce'
     open_tracker_announce_urls=[
         'udp://open.demonii.com:1337/announce',
