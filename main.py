@@ -12,7 +12,7 @@ def get_those_movies():
         'limit': 50,                # (20) [1-50] How many results to return per page
                                         ## Try lowering this if you keep getting errors
         'quality': '1080p',         # (All) [720p, 1080p, 2160p, 3D, All] Filter by a given quality
-        'minimum_rating': 9,        # (0) [0-9] Filter movie by a given minimum IMDb rating (inclusive)
+        'minimum_rating': 8,        # (0) [0-9] Filter movies by a given minimum IMDb rating (inclusive)
         'query_term': '',           # (0) [valid string] Movie search, matching on: Movie Title/IMDb Code, 
                                         ## Actor Name/IMDb Code, Director Name/IMDb Code
         'genre': '',                # (All) [valid string] Filter by a given genre 
