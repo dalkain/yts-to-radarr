@@ -59,7 +59,7 @@ def get_those_movies():
                                                     ## Settings > Profiles > Quality Profiles
         'monitor':True,                         # True/False, add movie in Monitored state
         'search':True,                          # True/False, auto-search for movie on add
-        'tags':['yts-api2']                      # OPTIONAL - list of tags to add to the movie
+        'tags':['yts-api']                      # OPTIONAL - list of tags to add to the movie
                                                     ## Set to '' for no tags
     }
     
@@ -171,8 +171,11 @@ def yts_cleandata(df, announce_urls, quality, only_english):
     return df
 
 def radarrapi_autoadd(df, radarr_params):
+    try: 
+        radarr = RadarrAPI(radarr_params['url'], radarr_params['api_key'])
+    except Exception as e:
+        sys.exit(e)
     # old code for adding movies one-at-a-time
-    # radarr = RadarrAPI(radarr_params['url'], radarr_params['api_key'])
     # for imdb_id in df['imdb_code'].unique():
     #     search = radarr.search_movies("imdb:" + imdb_id)
     #     if search:
@@ -183,10 +186,6 @@ def radarrapi_autoadd(df, radarr_params):
     #         except Exception as e:
     #             print(e)
     imdb_ids = df['imdb_code'].unique().tolist()
-    try: 
-        radarr = RadarrAPI(radarr_params['url'], radarr_params['api_key'])
-    except Exception as e:
-        sys.exit(e)
     print("  Trying to add " + str(len(imdb_ids)) + " movies to Radarr...")
     if str(len(imdb_ids)) > 50: print("  Please be patient. This may take awhile...")
     try:
