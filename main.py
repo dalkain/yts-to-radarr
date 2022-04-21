@@ -121,7 +121,8 @@ def ytsapi_getpage(url, query_params, page=1, mode='data'):
         print(errt)
     except requests.exceptions.RequestException as err:
         print(err)
-    sys.exit("  Please check your query parameters or wait a little while and try again.")
+    print("  Please check your query parameters or wait a little while and try again.")
+    sys.exit(1)
     
 def yts_cleandata(df, announce_urls, quality, only_english):
     print("\n  Cleaning up the data. Please wait...")
@@ -174,7 +175,8 @@ def radarrapi_autoadd(df, radarr_params):
     try: 
         radarr = RadarrAPI(radarr_params['url'], radarr_params['api_key'])
     except Exception as e:
-        sys.exit(e)
+        print(e)
+        sys.exit(1)
     # old code for adding movies one-at-a-time
     # for imdb_id in df['imdb_code'].unique():
     #     search = radarr.search_movies("imdb:" + imdb_id)
@@ -196,7 +198,8 @@ def radarrapi_autoadd(df, radarr_params):
   ''' + str(len(add_movies_results[1])) + ''' movies were already in Radarr
   ''' + str(len(add_movies_results[2])) + ''' movies could not be found or were excluded.''')
     except Exception as e:
-        sys.exit(e)
+        print(e)
+        sys.exit(1)
 
 if __name__ == "__main__":
     get_those_movies()
