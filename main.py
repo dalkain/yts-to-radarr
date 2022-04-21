@@ -1,3 +1,4 @@
+import sys
 import csv
 import json
 import math
@@ -58,7 +59,7 @@ def get_those_movies():
                                                     ## Settings > Profiles > Quality Profiles
         'monitor':True,                         # True/False, add movie in Monitored state
         'search':True,                          # True/False, auto-search for movie on add
-        'tags':['yts-api']                      # OPTIONAL - list of tags to add to the movie
+        'tags':['yts-api2']                      # OPTIONAL - list of tags to add to the movie
                                                     ## Set to '' for no tags
     }
     
@@ -73,9 +74,9 @@ def get_those_movies():
     if output_csv: 
         try:
             df_yts.to_csv("yts_movies.csv", index=False)
-            print("Successfully wrote yts_movies.csv")
+            print("  Successfully wrote yts_movies.csv")
         except:
-            print("Either yts_movies.csv or the directory is write-protected. No CSV output this time!")
+            print("  Either yts_movies.csv or the directory is write-protected. No CSV output this time!")
     if radarr_autoadd:
         radarrapi_autoadd(df_yts, radarr_api_parameters)
 
@@ -170,16 +171,33 @@ def yts_cleandata(df, announce_urls, quality, only_english):
     return df
 
 def radarrapi_autoadd(df, radarr_params):
-    radarr = RadarrAPI(radarr_params['url'], radarr_params['api_key'])
-    for imdb_id in df['imdb_code'].unique():
-        search = radarr.search_movies("imdb:" + imdb_id)
-        if search:
-            print("\nADDING MOVIE: " + str(search[0]))
-            try:
-                search[0].add(root_folder=radarr_params['root_folder'], quality_profile=radarr_params['quality_profile'], monitor=radarr_params['monitor'], search=radarr_params['search'], tags=radarr_params['tags'])
-                print("SUCCESS!")
-            except Exception as e:
-                print(e)
+    # old code for adding movies one-at-a-time
+    # radarr = RadarrAPI(radarr_params['url'], radarr_params['api_key'])
+    # for imdb_id in df['imdb_code'].unique():
+    #     search = radarr.search_movies("imdb:" + imdb_id)
+    #     if search:
+    #         print("\nADDING MOVIE: " + str(search[0]))
+    #         try:
+    #             search[0].add(root_folder=radarr_params['root_folder'], quality_profile=radarr_params['quality_profile'], monitor=radarr_params['monitor'], search=radarr_params['search'], tags=radarr_params['tags'])
+    #             print("SUCCESS!")
+    #         except Exception as e:
+    #             print(e)
+    imdb_ids = df['imdb_code'].unique().tolist()
+    try: 
+        radarr = RadarrAPI(radarr_params['url'], radarr_params['api_key'])
+    except Exception as e:
+        sys.exit(e)
+    print("  Trying to add " + str(len(imdb_ids)) + " movies to Radarr...")
+    if str(len(imdb_ids)) > 50: print("  Please be patient. This may take awhile...")
+    try:
+        add_movies_results = radarr.add_multiple_movies(ids=imdb_ids, root_folder=radarr_params['root_folder'], quality_profile=radarr_params['quality_profile'], monitor=radarr_params['monitor'], search=radarr_params['search'], tags=radarr_params['tags'])
+        print('''
+  Completed successfully!
+  Added ''' + str(len(add_movies_results[0])) + ''' new movies to Radarr
+  ''' + str(len(add_movies_results[1])) + ''' movies were already in Radarr
+  ''' + str(len(add_movies_results[2])) + ''' movies could not be found or were excluded.''')
+    except Exception as e:
+        sys.exit(e)
 
 if __name__ == "__main__":
     get_those_movies()
