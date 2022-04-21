@@ -140,7 +140,7 @@ def yts_cleandata(df, announce_urls, quality, only_english):
         # he, hi, ht, hu, hy, id, is, it, ja, ka, kk, km, kn, ko, ku, ky, la, lg, lt, lv, mk, ml, mn, mr, 
         # ms, mt, nb, nl, no, os, pa, pl, ps, pt, ro, ru, sh, sk, sl, so, sr, st, sv, sw, ta, te, th, tl, 
         # tr, uk, ur, vi, wo, xx, yi, zh, zu
-        df = df[(df['language'] == 'en') | (df['language'] == 'uk')]
+        df = df[(df['language'] == 'en')]
 
     # Break out torrent data
     df_torrents = df.explode('torrents').reset_index(drop=True)[['id', 'torrents']]
