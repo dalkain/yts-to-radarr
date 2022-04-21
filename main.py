@@ -136,10 +136,10 @@ def yts_cleandata(df, announce_urls, quality, only_english):
                             'small_cover_image','medium_cover_image','large_cover_image'], inplace=True)
     if only_english:
         # Just saving this list here for potential future changes. All languages found via the YTS API:
-        # af, ak, am, ar, be, bn, bo, bs, ca, cn, cs, cy, da, de, el, en, es, et, eu, fa, fi, fr, ga, gl, 
-        # he, hi, ht, hu, hy, id, is, it, ja, ka, kk, km, kn, ko, ku, ky, la, lg, lt, lv, mk, ml, mn, mr, 
-        # ms, mt, nb, nl, no, os, pa, pl, ps, pt, ro, ru, sh, sk, sl, so, sr, st, sv, sw, ta, te, th, tl, 
-        # tr, uk, ur, vi, wo, xx, yi, zh, zu
+        # af, ak, am, ar, be, bn, bo, bs, ca, cn, cs, cy, da, de, el, en, es, et, eu, fa, fi, fr, 
+        # ga, gl, he, hi, ht, hu, hy, id, is, it, ja, ka, kk, km, kn, ko, ku, ky, la, lg, lt, lv,
+        # mk, ml, mn, mr, ms, mt, nb, nl, no, os, pa, pl, ps, pt, ro, ru, sh, sk, sl, so, sr, st, 
+        # sv, sw, ta, te, th, tl, tr, uk, ur, vi, wo, xx, yi, zh, zu
         df = df[(df['language'] == 'en')]
 
     # Break out torrent data
