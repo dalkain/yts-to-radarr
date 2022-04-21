@@ -121,7 +121,7 @@ def ytsapi_getpage(url, query_params, page=1, mode='data'):
         print(errt)
     except requests.exceptions.RequestException as err:
         print(err)
-    print("  Please check your query parameters or wait a little while and try again.")
+    sys.exit("  Please check your query parameters or wait a little while and try again.")
     
 def yts_cleandata(df, announce_urls, quality, only_english):
     print("\n  Cleaning up the data. Please wait...")
