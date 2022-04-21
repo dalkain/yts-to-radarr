@@ -11,7 +11,7 @@ TO RUN:
 
 I run Radarr in docker on UnRAID using the lsio/radarr:nightly image (v4.2.0.6209 when this readme was updated), and I ran this script from my PC running python 3.9. I did not test this on other images/platforms, but it should work fine as long as your version of Radarr uses v3 of the API (and if your Radarr installation is so far out of date that is does not support the v3 API....update your stuff).
 
-I've got minimal experience with APIs, and had never even looked at the YTS or Radarr API documentation prior to making this. I don't know if the YTS API has rate limits as their documenbtation doesn't specify anything. The API seems to randomly stop returning things sometimes, but I've also been able to run a test pull of every 1080p encode they've ever released successfully (which is over 800 GETs). I never get an actual cooldown response in my (admittedly limited) testing. 
+I don't know if the YTS API has rate limits as their documenbtation doesn't specify anything. The API seems to randomly stop returning things sometimes, but I've also been able to run a test pull of every 1080p encode they've ever released successfully (which is over 800 GETs). I never get an actual cooldown response in my (admittedly limited) testing. 
 
 I will probably flesh this out a bit or clean it up more at some point down the road, but feel free to modify it for your own use.
 
