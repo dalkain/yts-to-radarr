@@ -18,4 +18,4 @@ The limitations of the YTS RSS feeds combined with the 6-hour minimum refresh fo
 - I don't know if the YTS API has rate limits as their documenbtation doesn't specify anything. The API seems to randomly stop returning things sometimes, but I've also been able to run a test pull of every 1080p encode they've ever released successfully (which is over 800 GETs at max page size).
 - I will probably flesh this out a bit or clean it up more at some point down the road, but feel free to modify it for your own use.
 
-##### DISCLAIMER: USE AT YOUR OWN RISK! I AM NOT RESPONSIBLE FOR WHAT INFORMATION YOU GATHER WITH THIS SCRIPT OR IF YOUR RADARR INSTALLATION DOESN'T PLAY NICE!
+##### DISCLAIMER: USE AT YOUR OWN RISK! I AM NOT RESPONSIBLE FOR INFORMATION YOU GATHER WITH THIS SCRIPT OR IF YOUR RADARR INSTALLATION DOESN'T PLAY NICE!
