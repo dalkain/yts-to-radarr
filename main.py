@@ -29,6 +29,7 @@ def get_those_movies():
         'minimum_rating': 8,        # (0) [0-9] Filter movies by a given minimum IMDb rating (inclusive)
         'query_term': '',           # (0) [valid string] Movie search, matching on: Movie Title/IMDb Code, 
                                         ## Actor Name/IMDb Code, Director Name/IMDb Code
+                                        ## Seems very unreliable for anything but movie name/imdbid searching
         'genre': '',                # (All) [valid string] Filter by a given genre 
                                         ## (See http://www.imdb.com/genre/ for full list)
         'with_rt_ratings': 'false' # (false) [true, false] Returns the list with the Rotten Tomatoes ratings 
@@ -72,7 +73,7 @@ def get_those_movies():
                                                     ## Settings > Profiles > Quality Profiles
         'monitor':True,                         # True/False, add movie in Monitored state
         'search':True,                          # True/False, auto-search for movie on add
-        'tags':['yts-api']                      # OPTIONAL - list of tags to add to the movie
+        'tags':['yts-api']                      # List of tags to add to the movie
                                                     ## Set to '' for no tags
     }
     
