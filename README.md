@@ -5,7 +5,7 @@ YES! I'm a filthy pleb and I like YIFY encodes for my personal consumption. If t
 ## What does this do?
 Grabs a list of movies released by YTS using their API based on configurable criteria. It also allows for a few more filtering options than the YTS API natively supports
   
-With this data, you are given the option to:
+With this data, you are given the option to do any combination of the following:
 - Export all of the details from the YTS API to a CSV
 - Automatically grab all related torrent files from YTS
 - Export a txt file with a list of magnet links to the related torrents from YTS
