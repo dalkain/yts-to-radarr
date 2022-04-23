@@ -1,3 +1,4 @@
+import os
 import sys
 import csv
 import json
@@ -7,7 +8,19 @@ import pandas as pd
 from arrapi import RadarrAPI
 
 def get_those_movies():
-    # Change these parameters to suit your needs
+
+    ##### IMPORTANT #####
+    # At least some of the configurations are case-sensitive, so please just assume they all are 
+    # and follow the examples or what is displayed in the comments.
+
+    # What portions to run:
+    output_csv = True           # Do you want to output a CSV with all the juicy details from the YTS API?
+    grab_torrent_files = True    # Download .torrent file for every result?
+    export_magnet_list = True  # Export .txt file with just the generated magnet links  
+    radarr_autoadd = True       # Do you want the script to automatically add all found movies
+                                    ## to Radarr using the radarr_api_parameters specified below?
+
+   
     yts_query_parameters = {
         # Set up your parameters:   # (default value) [valid values] description of parameter
         'limit': 50,                # (20) [1-50] How many results to return per page
@@ -18,17 +31,24 @@ def get_those_movies():
                                         ## Actor Name/IMDb Code, Director Name/IMDb Code
         'genre': '',                # (All) [valid string] Filter by a given genre 
                                         ## (See http://www.imdb.com/genre/ for full list)
-        'sort_by': 'year',          # (date_added) [title, year, rating, peers, seeds, download_count, 
-                                        ## like_count, date_added] Sorts the results by choosen value
-        'order_by': 'desc',         # (desc) [desc, asc] Orders results by either Ascending or Descending order
-        'with_rt_ratings': 'false', # (false) [true, false] Returns the list with the Rotten Tomatoes rating included  
+        'with_rt_ratings': 'false' # (false) [true, false] Returns the list with the Rotten Tomatoes ratings 
     }
-    # These trackers will get appended to the magnet_url that ends up in the DataFrame and CSV output
-    # NOTE: The ones shown here are listed in the official YTS API docs as examples, but I'm pretty sure most 
-    # (or all) of them no longer work. These are only important if you plan to manually add magnets to your 
-    # torrent client from the CSV output instead of letting Radarr do the searching.
-    # example: 'udp://sometracker.url:80/announce'
-    open_tracker_announce_urls=[
+    # Additional YTS filtering options not built into the YTS API. These filters will apply after communication 
+    # with the YTS API is completed but before outputting any data.
+    yts_earliest_year = 1950            # Set an earliest movie release year to filter the results 
+                                            ## Use 4-digit year (e.g. 1950). Set to 0 to include everything
+    yts_preferred_release = 'bluray'    # (bluray) [bluray, web] Which YTS release (if both exist) do you prefer
+    yts_primary_languages = ['en']      # Only return movies of specified languages. Set to [] for all languages.
+    ## LANGUAGE CODES RETURNED BY THE API AS OF 2022-04. Keep in mind YTS primarily releases English ('en') films.
+    ## af, ak, am, ar, be, bn, bo, bs, ca, cn, cs, cy, da, de, el, en, es, et, eu, fa, fi, fr, ga, gl, he, hi, ht, 
+    ## hu, hy, id, is, it, ja, ka, kk, km, kn, ko, ku, ky, la, lg, lt, lv, mk, ml, mn, mr, ms, mt, nb, nl, no, os, 
+    ## pa, pl, ps, pt, ro, ru, sh, sk, sl, so, sr, st, sv, sw, ta, te, th, tl, tr, uk, ur, vi, wo, xx, yi, zh, zu
+
+    # The below trackers will get appended to the generated magnet_url
+        ## NOTE: The ones shown here are listed in the YTS API docs as examples, but they may
+        ## no longer work. These are only important if you plan to use magnet links to add torrents
+        ##  example: 'udp://sometracker.url:80/announce'
+    magnet_tracker_announce_urls=[
         'udp://open.demonii.com:1337/announce',
         'udp://tracker.openbittorrent.com:80',
         'udp://tracker.coppersurfer.tk:6969',
@@ -40,15 +60,8 @@ def get_those_movies():
         'udp://tracker.internetwarriors.net:1337',
         'udp://p4p.arenabg.ch:1337'
     ]
-    # Various settings
-    only_english = True     # Only return movies that are primarily in English? 
-                                ## NOTE: The YTS API doesn't actually support filtering on this value, so it will still
-                                ## initially need to return all language results. The script will filter the list after 
-                                ## it's done with the YTS API and before outputting a CSV or adding movies to Radarr
-    output_csv = True       # Do you want to output a CSV with all the juicy details from the YTS API?
-    radarr_autoadd = True   # Do you want the script to automatically add all found movies
-                                ## to Radarr using the radarr_api_parameters specified below?
-    # Change these parameters for your Radarr instance/preferences
+   
+    # Radarr Configuration
     radarr_api_parameters = {
         'url': 'http://192.168.10.2:7878',      # Protocol, IP/hostname, and port used to access Radarr
         'api_key': 'REDACTED',                  # Copy directly from Radarr 
@@ -64,32 +77,54 @@ def get_those_movies():
     }
     
     
-    
 ###############################################
 ### You shouldn't need to modify below here ###
 ###############################################
     # Do ALL the things
     df_yts = ytsapi(yts_query_parameters)
-    df_yts = yts_cleandata(df_yts, open_tracker_announce_urls, yts_query_parameters['quality'], only_english)
+    df_yts = yts_cleandata(df_yts, magnet_tracker_announce_urls, yts_query_parameters['quality'], yts_earliest_year, yts_preferred_release, yts_primary_languages)
+    if len(df_yts['id']) > 0:
+        print("  After applying your filters, " + str(len(df_yts['id'])) + " releases were found.")
+    if len(df_yts['id']) == 0:
+        print("  No movies were found that match all of your criteria.\n  Please change your YTS options and try again.")
+        sys.exit(1)
+    if output_csv or grab_torrent_files or export_magnet_list:
+        # make an output directory only if we expect file output
+        output_dir = os.getcwd() + "/output/"
+        if not os.path.exists(output_dir):
+            try:
+                os.mkdir(output_dir)
+            except:
+                print('''  Unable to create output directory.
+  Please make sure to run with proper permissions, 
+  or disable all options that output files to your system.
+                ''')
+                sys.exit(1)
     if output_csv: 
         try:
-            df_yts.to_csv("yts_movies.csv", index=False)
-            print("  Successfully wrote yts_movies.csv")
+            df_yts.to_csv(output_dir + "^yts_movies.csv", index=False)
+            print("  Successfully wrote ^yts_movies.csv")
         except:
             print("  Either yts_movies.csv or the directory is write-protected. No CSV output this time!")
+    if grab_torrent_files:
+        download_torr_files(df_yts, output_dir)
+    if export_magnet_list:
+        try:           
+            with open(output_dir + '^yts_magnets.txt', 'w') as f:
+                f.write(df_yts['torrent.magnet_url'].str.cat(sep='\n'))
+            print("  Successfully wrote ^yts_magnets.csv")
+        except:
+            print("  Either yts_magnets.csv or the output directory is write-protected. No magnet list output this time!")
     if radarr_autoadd:
         radarrapi_autoadd(df_yts, radarr_api_parameters)
 
 
 def ytsapi(yts_query_params):
     yts_api_url = "https://yts.mx/api/v2/list_movies.json"
-    
     df = pd.DataFrame()
-
     pages = ytsapi_getpage(yts_api_url, yts_query_params, mode='pages')
-
     # pages = 3   # when debugging, you probably don't want to pull every page.
-    print("\n  Grabbing " + str(pages) + " pages worth of results. This may take some time...")
+    print("\n  Grabbing " + str(pages) + " pages worth of releases. This may take some time...")
     for page in range(pages):
         page += 1
         # print("Grabbing page " + str(page) + "...") # might come in handy when debugging
@@ -124,52 +159,58 @@ def ytsapi_getpage(url, query_params, page=1, mode='data'):
     print("  Please check your query parameters or wait a little while and try again.")
     sys.exit(1)
     
-def yts_cleandata(df, announce_urls, quality, only_english):
+def yts_cleandata(df, announce_urls, quality, year, release, languages):
     print("\n  Cleaning up the data. Please wait...")
     magnet_announce_string = ""
     for url in announce_urls:
         magnet_announce_string += "&tr=" + url
-        
-    # Drop duplicate YTS movie ids, if they exist
-    df.drop_duplicates(['id'], keep='first', ignore_index=True, inplace=True)
-    # Drop unnecessary movies columns
-    df.drop(columns=['summary','description_full','background_image','background_image_original',
-                            'small_cover_image','medium_cover_image','large_cover_image'], inplace=True)
-    if only_english:
-        # Just saving this list here for potential future changes. All languages found via the YTS API:
-        # af, ak, am, ar, be, bn, bo, bs, ca, cn, cs, cy, da, de, el, en, es, et, eu, fa, fi, fr, 
-        # ga, gl, he, hi, ht, hu, hy, id, is, it, ja, ka, kk, km, kn, ko, ku, ky, la, lg, lt, lv,
-        # mk, ml, mn, mr, ms, mt, nb, nl, no, os, pa, pl, ps, pt, ro, ru, sh, sk, sl, so, sr, st, 
-        # sv, sw, ta, te, th, tl, tr, uk, ur, vi, wo, xx, yi, zh, zu
-        df = df[(df['language'] == 'en')]
-
+    df_sort = {'torrent.quality': ['2160p', '1080p', '720p', '3D']}
+    # Set sort order based on preferred release:
+    if release.lower() == 'bluray': df_sort['torrent.type'] = ['bluray', 'web']
+    if release.lower() == 'web': df_sort['torrent.type'] = ['web', 'bluray']
+    # Filter year
+    df = df[df['year'] >= year]
+    # Filter language, if set
+    if len(languages) > 0:
+        df = df[df['language'].isin(languages)]
+    # Make sure the applied filters haven't emptied the results list.
+    if len(df['id']) == 0:
+        print("  No movies were found that match all of your criteria.\n  Please change your YTS options and try again.")
+        sys.exit(1)
     # Break out torrent data
+    torrents_columns = list(pd.DataFrame(df['torrents'].iat[0]).columns)
     df_torrents = df.explode('torrents').reset_index(drop=True)[['id', 'torrents']]
-    df_torrents['torrent.url'] = df_torrents.torrents.apply(lambda x: x['url'])
-    df_torrents['torrent.hash'] = df_torrents.torrents.apply(lambda x: x['hash'])
-    df_torrents['torrent.quality'] = df_torrents.torrents.apply(lambda x: x['quality'])
-    df_torrents['torrent.type'] = df_torrents.torrents.apply(lambda x: x['type'])
-    df_torrents['torrent.seeds'] = df_torrents.torrents.apply(lambda x: x['seeds'])
-    df_torrents['torrent.peers'] = df_torrents.torrents.apply(lambda x: x['peers'])
-    df_torrents['torrent.size'] = df_torrents.torrents.apply(lambda x: x['size'])
-    # df_torrents['torrent.size_bytes'] = df_torrents.torrents.apply(lambda x: x['size_bytes'])
-    df_torrents['torrent.date_uploaded'] = df_torrents.torrents.apply(lambda x: x['date_uploaded'])
-    df_torrents['torrent.date_uploaded_unix'] = df_torrents.torrents.apply(lambda x: x['date_uploaded_unix'])
-
-    # Drop duplicate torrent hashes, if they exist
-    df_torrents.drop_duplicates(['torrent.hash'], keep='first', ignore_index=True, inplace=True)
-    # Filter down to selected quality
-    if quality.lower() != 'all':
-        df_torrents = df_torrents[df_torrents['torrent.quality'] == quality.lower()]
+    for column in torrents_columns:
+        df_torrents['torrent.' + column] = df_torrents.torrents.apply(lambda x: x[column])
+    # Filter down to selected quality.
+    if quality != 'All':
+        df_torrents = df_torrents[df_torrents['torrent.quality'] == quality]
     # Concatenate quality
     df_torrents['torrent.full_quality'] = df_torrents['torrent.quality'].astype(str).str.upper() + "-" + df_torrents['torrent.type'].astype(str).str.upper()
-    # Drop extra torrent columns
-    df_torrents.drop(columns=['torrents','torrent.quality','torrent.type'], inplace=True)
     # Merge the torrent data back into the main dataframe
     df = df.merge(df_torrents, how='left', on='id', validate='one_to_many')
-    df.drop(columns=['torrents'], inplace=True)
-    df['torrent.magnet_url'] = "magnet:?xt=urn:btih:" + df['torrent.hash'] + "&dn=" + df['slug'] + magnet_announce_string
+    df.drop(columns=['torrents_x', 'torrents_y'], inplace=True)
+    df['torrent.magnet_url'] = "magnet:?xt=urn:btih:" + df['torrent.hash'] + "&dn=" + df['slug'] + "---" + df['torrent.quality'] + "-" + df['torrent.type'] + magnet_announce_string
+    # Sort quality/release and then keep only preferred
+    df['torrent.quality'] = pd.Categorical(df['torrent.quality'], df_sort['torrent.quality'])
+    df['torrent.type'] = pd.Categorical(df['torrent.type'], df_sort['torrent.type'])
+    df.sort_values(['imdb_code','torrent.quality','torrent.type'], inplace=True)
+    df.drop_duplicates(['imdb_code','torrent.quality'], keep='first', inplace=True, ignore_index=True)
     return df
+
+def download_torr_files(df, output_dir):
+    failed = 0
+    print("  Attempting to download " + str(len('torrent.url')) + " torrents. This may take awhile...")
+    for tor in df['torrent.url']:
+        print(tor)
+        try:
+            tor = requests.get(tor, allow_redirects=True)
+            filename = str.split(tor.headers.get('content-disposition'), '"')[1]
+            open(output_dir + filename, 'wb').write(tor.content)
+        except:
+            failed += 1
+            print(filename + " failed to download.")
+    print("  Finished downloading! (" + str(failed) + "/" + str(len('torrent.url')) + " failed to download)")
 
 def radarrapi_autoadd(df, radarr_params):
     try: 
@@ -177,16 +218,6 @@ def radarrapi_autoadd(df, radarr_params):
     except Exception as e:
         print(e)
         sys.exit(1)
-    # old code for adding movies one-at-a-time
-    # for imdb_id in df['imdb_code'].unique():
-    #     search = radarr.search_movies("imdb:" + imdb_id)
-    #     if search:
-    #         print("\nADDING MOVIE: " + str(search[0]))
-    #         try:
-    #             search[0].add(root_folder=radarr_params['root_folder'], quality_profile=radarr_params['quality_profile'], monitor=radarr_params['monitor'], search=radarr_params['search'], tags=radarr_params['tags'])
-    #             print("SUCCESS!")
-    #         except Exception as e:
-    #             print(e)
     imdb_ids = df['imdb_code'].unique().tolist()
     print("  Trying to add " + str(len(imdb_ids)) + " movies to Radarr...")
     if str(len(imdb_ids)) > 50: print("  Please be patient. This may take awhile...")
