@@ -2,6 +2,8 @@
 
 YES! I'm a filthy pleb and I like YIFY encodes for my personal consumption. If that also describes you, then please feel free to adapt script this to your wants.
 
+This script pulls lists of movies that meet specified criteria from the YTS API, and optionally dumps all of the details into a CSV or adds all of them to Radarr via its API.
+
 ## Why does this exist?
 The limitations of the YTS RSS feeds combined with the 6-hour minimum refresh for Lists in Radarr means I occasionally miss some new YTS releases and was unable to automate pulling the back catalog. I spent a couple hours throwing together this python script to extract more of the YTS catalog from the YTS API and add them directly into Radarr and initiate an automatic search. I tried to make it somewhat user-friendly for individual customization (or for running multiple times with different criteria)!
 
