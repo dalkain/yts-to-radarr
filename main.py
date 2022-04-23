@@ -15,8 +15,8 @@ def get_those_movies():
 
     # What portions to run:
     output_csv = True           # Do you want to output a CSV with all the juicy details from the YTS API?
-    grab_torrent_files = True    # Download .torrent file for every result?
-    export_magnet_list = True  # Export .txt file with just the generated magnet links  
+    grab_torrent_files = True   # Download .torrent file for every result?
+    export_magnet_list = True   # Export .txt file with just the generated magnet links  
     radarr_autoadd = True       # Do you want the script to automatically add all found movies
                                     ## to Radarr using the radarr_api_parameters specified below?
 
