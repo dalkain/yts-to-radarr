@@ -1,6 +1,6 @@
 import os
 import sys
-import csv
+
 import json
 import math
 import requests
@@ -124,7 +124,6 @@ def ytsapi(yts_query_params):
     yts_api_url = "https://yts.mx/api/v2/list_movies.json"
     df = pd.DataFrame()
     pages = ytsapi_getpage(yts_api_url, yts_query_params, mode='pages')
-    # pages = 3   # when debugging, you probably don't want to pull every page.
     print("\n  Grabbing " + str(pages) + " pages worth of releases. This may take some time...")
     for page in range(pages):
         page += 1
@@ -189,6 +188,7 @@ def yts_cleandata(df, announce_urls, quality, year, release, languages):
     # Concatenate quality
     df_torrents['torrent.full_quality'] = df_torrents['torrent.quality'].astype(str).str.upper() + "-" + df_torrents['torrent.type'].astype(str).str.upper()
     # Merge the torrent data back into the main dataframe
+    df.drop_duplicates(['id'], keep='first', inplace=True, ignore_index=True)
     df = df.merge(df_torrents, how='left', on='id', validate='one_to_many')
     df.drop(columns=['torrents_x', 'torrents_y'], inplace=True)
     df['torrent.magnet_url'] = "magnet:?xt=urn:btih:" + df['torrent.hash'] + "&dn=" + df['slug'] + "---" + df['torrent.quality'] + "-" + df['torrent.type'] + magnet_announce_string
