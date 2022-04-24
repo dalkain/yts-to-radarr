@@ -221,7 +221,7 @@ def radarrapi_autoadd(df, radarr_params):
         sys.exit(1)
     imdb_ids = df['imdb_code'].unique().tolist()
     print("  Trying to add " + str(len(imdb_ids)) + " movies to Radarr...")
-    if str(len(imdb_ids)) > 50: print("  Please be patient. This may take awhile...")
+    if len(imdb_ids) > 50: print("  Please be patient. This may take awhile...")
     try:
         add_movies_results = radarr.add_multiple_movies(ids=imdb_ids, root_folder=radarr_params['root_folder'], quality_profile=radarr_params['quality_profile'], monitor=radarr_params['monitor'], search=radarr_params['search'], tags=radarr_params['tags'])
         print('''
