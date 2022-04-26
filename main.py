@@ -38,7 +38,7 @@ def get_those_movies():
     # with the YTS API is completed but before outputting any data.
     yts_earliest_year = 1950            # Set an earliest movie release year to filter the results 
                                             ## Use 4-digit year (e.g. 1950). Set to 0 to include everything
-    yts_preferred_release = 'bluray'    # (bluray) [bluray, web] Which YTS release (if both exist) do you prefer
+    yts_preferred_release = 'web'    # (bluray) [bluray, web] Which YTS release (if both exist) do you prefer
     yts_primary_languages = ['en']      # Only return movies of specified languages. Set to [] for all languages.
     ## LANGUAGE CODES RETURNED BY THE API AS OF 2022-04. Keep in mind YTS primarily releases English ('en') films.
     ## af, ak, am, ar, be, bn, bo, bs, ca, cn, cs, cy, da, de, el, en, es, et, eu, fa, fi, fr, ga, gl, he, hi, ht, 
