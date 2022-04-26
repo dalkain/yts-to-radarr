@@ -24,7 +24,5 @@ The limitations of the YTS RSS feeds combined with the 6-hour minimum refresh fo
   - No, I didn't make it guided or executable or anything like that (maybe one day); it's just a flat python script that needs to be run in a terminal.
 
 ### Other Notes
-- I run Radarr in docker on UnRAID using the lsio/radarr:nightly image (v4.2.0.6209 when this readme was updated), and I ran this script on my Windows PC running python 3.9. I did not test this on other images/platforms, but it should work fine as long as your version of Radarr uses v3 of the API _(and if your Radarr installation is so far out of date that is does not support the v3 API....update your stuff)_
+- I run Radarr in docker on UnRAID using the lsio/radarr:nightly image (v4.2.0.6209 when this readme was created), and I ran this script on my Windows PC running python 3.9. I did not test this on other images/platforms, but it should work fine as long as your version of Radarr uses v3 of the API _(and if your Radarr installation is so far out of date that is does not support the v3 API....update your stuff)_
 - I don't know if the YTS API has rate limits as their documenbtation doesn't specify anything. The API seems to randomly stop returning things randomly sometimes, but I've also been able to run a test pull of every 1080p encode they've ever released successfully (which is over 800 GETs even at the max page size).
-
-##### DISCLAIMER: USE AT YOUR OWN RISK! I AM NOT RESPONSIBLE FOR INFORMATION YOU GATHER WITH THIS SCRIPT OR IF YOUR RADARR INSTALLATION DOESN'T PLAY NICE!
