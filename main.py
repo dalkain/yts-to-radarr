@@ -118,9 +118,10 @@ def get_those_movies():
         except:
             print("  Either yts_magnets.csv or the output directory is write-protected. No magnet list output this time!")
     if radarr_autoadd:
+        input("  Press ENTER to continue with adding movies to Radarr...")
         radarr_response = radarrapi_autoadd(df_yts, radarr_api_parameters)
-    if radarr_results:
-        radarr_export(output_dir, radarr_response)
+        if radarr_results:
+            radarr_export(output_dir, radarr_response)
 
 
 def ytsapi(yts_query_params):
@@ -147,7 +148,7 @@ def ytsapi_getpage(url, query_params, page=1, mode='data'):
             movie_count = response.json()['data']['movie_count']
             page_count = int(math.ceil(response.json()['data']['movie_count']/response.json()['data']['limit']))
             print("  Found " + str(movie_count) + " movies that match query parameters. (" + str(page_count) + " pages)")
-            input("  Press ENTER to continue with pulling data.")
+            input("  Press ENTER to continue with pulling data...")
             return page_count
         else:
             return response
