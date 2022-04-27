@@ -1,11 +1,11 @@
 import os
 import sys
-
 import json
 import math
 import requests
 import pandas as pd 
 from arrapi import RadarrAPI
+
 
 def get_those_movies():
 
@@ -19,6 +19,7 @@ def get_those_movies():
     export_magnet_list = True   # Export .txt file with just the generated magnet links  
     radarr_autoadd = True       # Do you want the script to automatically add all found movies
                                     ## to Radarr using the radarr_api_parameters specified below?
+    radarr_results = True       # Export the results of the radarr autoadd
 
    
     yts_query_parameters = {
@@ -26,7 +27,7 @@ def get_those_movies():
         'limit': 50,                # (20) [1-50] How many results to return per page
                                         ## Try lowering this if you keep getting errors
         'quality': '1080p',         # (All) [720p, 1080p, 2160p, 3D, All] Filter by a given quality
-        'minimum_rating': 8,        # (0) [0-9] Filter movies by a given minimum IMDb rating (inclusive)
+        'minimum_rating': 0,        # (0) [0-9] Filter movies by a given minimum IMDb rating (inclusive)
         'query_term': '',           # (0) [valid string] Movie search, matching on: Movie Title/IMDb Code, 
                                         ## Actor Name/IMDb Code, Director Name/IMDb Code
                                         ## Seems very unreliable for anything but movie name/imdbid searching
@@ -117,7 +118,9 @@ def get_those_movies():
         except:
             print("  Either yts_magnets.csv or the output directory is write-protected. No magnet list output this time!")
     if radarr_autoadd:
-        radarrapi_autoadd(df_yts, radarr_api_parameters)
+        radarr_response = radarrapi_autoadd(df_yts, radarr_api_parameters)
+    if radarr_results:
+        radarr_export(output_dir, radarr_response)
 
 
 def ytsapi(yts_query_params):
@@ -229,9 +232,39 @@ def radarrapi_autoadd(df, radarr_params):
   Added ''' + str(len(add_movies_results[0])) + ''' new movies to Radarr
   ''' + str(len(add_movies_results[1])) + ''' movies were already in Radarr
   ''' + str(len(add_movies_results[2])) + ''' movies could not be found or were excluded.''')
+        return add_movies_results
     except Exception as e:
         print(e)
         sys.exit(1)
+
+def radarr_export(output_dir, response):
+    # Export added
+    if len(response[0]) > 0:
+        try:           
+            with open(output_dir + '^radarr_added.txt', 'w') as f:
+                for result in response[0]:
+                    f.write(result.title + " (" + str(result.year) + ") " + "[imdb-" + result.imdbId + "]\n")
+            print("  Successfully wrote ^radarr_added.txt")
+        except:
+            print("  Either ^radarr_added.txt or the output directory is write-protected. No new output this time!")
+    # Export already existing
+    if len(response[1]) > 0:
+        try:           
+            with open(output_dir + '^radarr_already_existing.txt', 'w') as f:
+                for result in response[1]:
+                    f.write(result.title + " (" + str(result.year) + ") " + "[imdb-" + result.imdbId + "]\n")
+            print("  Successfully wrote ^radarr_already_existing.txt")
+        except:
+            print("  Either ^radarr_already_existing.txt or the output directory is write-protected. No new output this time!")
+    # Export failures
+    if len(response[1]) > 0:
+        try:           
+            with open(output_dir + '^radarr_failed_to_add.txt', 'w') as f:
+                for result in response[2]:
+                    f.write(str(result) + "\n")
+            print("  Successfully wrote ^radarr_failed_to_add.txt")
+        except:
+            print("  Either ^radarr_failed_to_add.txt or the output directory is write-protected. No new output this time!")
 
 if __name__ == "__main__":
     get_those_movies()
