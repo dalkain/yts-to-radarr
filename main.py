@@ -15,7 +15,7 @@ def get_those_movies():
 
     # What portions to run:
     output_csv = True           # Do you want to output a CSV with all the juicy details from the YTS API?
-    grab_torrent_files = True   # Download .torrent file for every result?
+    grab_torrent_files = False   # Download .torrent file for every result?
     export_magnet_list = True   # Export .txt file with just the generated magnet links  
     radarr_autoadd = True       # Do you want the script to automatically add all found movies
                                     ## to Radarr using the radarr_api_parameters specified below?
@@ -27,7 +27,7 @@ def get_those_movies():
         'limit': 50,                # (20) [1-50] How many results to return per page
                                         ## Try lowering this if you keep getting errors
         'quality': '1080p',         # (All) [720p, 1080p, 2160p, 3D, All] Filter by a given quality
-        'minimum_rating': 8,        # (0) [0-9] Filter movies by a given minimum IMDb rating (inclusive)
+        'minimum_rating': 7,        # (0) [0-9] Filter movies by a given minimum IMDb rating (inclusive)
         'query_term': '',           # (0) [valid string] Movie search, matching on: Movie Title/IMDb Code, 
                                         ## Actor Name/IMDb Code, Director Name/IMDb Code
                                         ## Seems very unreliable for anything but movie name/imdbid searching
@@ -37,7 +37,7 @@ def get_those_movies():
     }
     # Additional YTS filtering options not built into the YTS API. These filters will apply after communication 
     # with the YTS API is completed but before outputting any data.
-    yts_earliest_year = 2022            # Set an earliest movie release year to filter the results 
+    yts_earliest_year = 2023            # Set an earliest movie release year to filter the results 
                                             ## Use 4-digit year (e.g. 1950). Set to 0 to include everything
     yts_preferred_release = 'web'    # (bluray) [bluray, web] Which YTS release (if both exist) do you prefer
     yts_primary_languages = ['en']      # Only return movies of specified languages. Set to [] for all languages.
@@ -70,7 +70,7 @@ def get_those_movies():
                                                     ## Settings > General > Security > API Key
         'root_folder': '/data/media/Movies',    # Must match Path exactly as shown in Radarr
                                                     ## Settings > Media Management > Root Folders > Path
-        'quality_profile': 'HD-1080p YTS',      # Must match Name of a Quality Profile in Radarr
+        'quality_profile': 'HD - YTS',          # Must match Name of a Quality Profile in Radarr
                                                     ## Settings > Profiles > Quality Profiles
         'monitor':True,                         # True/False, add movie in Monitored state
         'search':True,                          # True/False, auto-search for movie on add
@@ -116,7 +116,7 @@ def get_those_movies():
                 f.write(df_yts['torrent.magnet_url'].str.cat(sep='\n'))
             print("  Successfully wrote ^yts_magnets.csv")
         except:
-            print("  Either yts_magnets.csv or the output directory is write-protected. No magnet list output this time!")
+            print("  Either ^yts_magnets.csv or the output directory is write-protected. No magnet list output this time!")
     if radarr_autoadd:
         input("  Press ENTER to continue with adding movies to Radarr...")
         radarr_response = radarrapi_autoadd(df_yts, radarr_api_parameters)
